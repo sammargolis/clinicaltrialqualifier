@@ -1,0 +1,207 @@
+================================================================================
+CLINICAL TRIAL MATCHING REPORT
+================================================================================
+
+Total Trials Evaluated: 6
+Qualified: 1
+Not Qualified: 5
+Needs More Information: 0
+
+--------------------------------------------------------------------------------
+
+1. Randomized Trial of GLP-1 Agonist for Type 2 Diabetes with Cardiovascular Disease
+   Trial ID: NCT05876543
+   Status: NOT_QUALIFIED
+   Confidence: 100.00%
+   Contact: t2d-cvd-study@adaresearch.org | Phone: 1-888-555-0267
+
+   ✓ Inclusion Criteria Met (2):
+     • Age 40-75 years (patient is 62 years old)
+     • eGFR ≥45 mL/min/1.73m² (patient has CrCl 75 mL/min)
+
+   ✗ Inclusion Criteria Not Met (8):
+     • Diagnosis of type 2 diabetes mellitus for at least 1 year (no diabetes diagnosis mentioned)
+     • HbA1c between 7.0% and 10.5% (no HbA1c value provided)
+     • History of cardiovascular disease (no cardiovascular disease history mentioned)
+     • Currently on stable metformin therapy for at least 3 months (no diabetes medications mentioned)
+     • BMI ≥25 kg/m² (no BMI or weight/height data provided)
+     • Stable cardiovascular medication regimen for at least 6 weeks (no cardiovascular medications mentioned)
+     • Willing to perform home glucose monitoring (not applicable without diabetes)
+     • Able to self-administer subcutaneous injections (not assessed due to lack of diabetes diagnosis)
+
+   ⚠ Exclusion Criteria Violated (1):
+     • Active malignancy requiring treatment (patient has Stage IV non-small cell lung cancer and completed chemotherapy only 3 months ago, indicating active cancer requiring ongoing management)
+
+   Reasoning:
+     This patient does NOT qualify for this diabetes clinical trial.
+     The fundamental issue is that this is a 62-year-old male with Stage IV non-small cell lung cancer, while the trial is specifically for patients with type 2 diabetes mellitus and cardiovascular disease.
+     The patient data shows no evidence of diabetes diagnosis, diabetes medications, HbA1c values, or cardiovascular disease history.
+     Most critically, the patient has an active malignancy (Stage IV lung cancer) that was treated with chemotherapy as recently as 3 months ago, which directly violates the exclusion criterion for 'active malignancy requiring treatment.' Even if the patient had diabetes, the active cancer diagnosis would disqualify them from this cardiovascular outcomes trial.
+     The patient meets only 2 of the 9 inclusion criteria (age and kidney function) and violates at least one major exclusion criterion..
+
+--------------------------------------------------------------------------------
+
+2. Early Intervention Study for Alzheimer's Disease with Novel Tau-Targeting Agent
+   Trial ID: NCT05432198
+   Status: NOT_QUALIFIED
+   Confidence: 100.00%
+   Contact: adcs-recruitment@ucsd.edu | Phone: 1-877-555-0334
+
+   ✓ Inclusion Criteria Met (1):
+     • Age 55-85 years (patient is 62 years old)
+
+   ✗ Inclusion Criteria Not Met (10):
+     • Clinical diagnosis of MCI due to AD or mild AD dementia (patient has Stage IV non-small cell lung cancer)
+     • Mini-Mental State Examination (MMSE) score 20-28 (no MMSE data provided)
+     • Clinical Dementia Rating (CDR) global score of 0.5 or 1.0 (no CDR data provided)
+     • Positive amyloid PET scan or CSF biomarkers consistent with Alzheimer's pathology (no such testing mentioned)
+     • Positive tau PET scan showing significant tau burden (no tau PET mentioned)
+     • Stability on cholinesterase inhibitor and/or memantine for at least 3 months (no mention of these medications)
+     • Study partner/caregiver available who spends at least 10 hours per week with participant (no information provided)
+     • Adequate visual and auditory acuity for cognitive testing (no information provided)
+     • Fluent in English or Spanish (no information provided)
+     • Willing to undergo serial MRI and PET scans (no information provided)
+
+   ⚠ Exclusion Criteria Violated (1):
+     • History of cancer within past 5 years (patient has active Stage IV non-small cell lung cancer diagnosed 6 months ago)
+
+   Reasoning:
+     This patient is clearly not qualified for this Alzheimer's disease clinical trial.
+     The fundamental mismatch is that this is a 62-year-old male with active Stage IV non-small cell lung cancer, while the trial is specifically designed for patients with mild cognitive impairment or mild Alzheimer's disease.
+     The patient violates a major exclusion criterion as he has a history of cancer within the past 5 years (diagnosed 6 months ago with ongoing active disease).
+     Additionally, the patient does not meet any of the core inclusion criteria specific to Alzheimer's disease, including: no clinical diagnosis of MCI or AD, no cognitive assessment scores (MMSE, CDR), no amyloid or tau biomarker evidence, and no mention of Alzheimer's-related symptoms or treatments.
+     The patient's medical profile is entirely focused on oncology care (chemotherapy, staging, performance status) rather than neurodegenerative disease.
+     This represents a complete mismatch between patient condition and trial objectives..
+
+--------------------------------------------------------------------------------
+
+3. Multicenter Study of Biologic Therapy for Moderate to Severe Rheumatoid Arthritis
+   Trial ID: NCT05654321
+   Status: NOT_QUALIFIED
+   Confidence: 100.00%
+   Contact: ra-trial@rheumatology-trials.org | Phone: 1-866-555-0445
+
+   ✓ Inclusion Criteria Met (3):
+     • Age 18-75 years (patient is 62 years old)
+     • Negative tuberculosis screening implied (no active infections noted)
+     • Laboratory values meet minimum thresholds (Hgb 10.5 g/dL >8.5, platelets 150K >100K, neutrophils implied adequate from ANC 2,100, AST/ALT within normal limits, creatinine 0.9 <2.0)
+
+   ✗ Inclusion Criteria Not Met (8):
+     • Diagnosis of rheumatoid arthritis meeting 2010 ACR/EULAR classification criteria - patient has lung cancer, not RA
+     • Disease duration of at least 6 months for RA - patient has lung cancer diagnosed 6 months ago
+     • Moderate to severe active RA disease (≥6 tender joints and ≥6 swollen joints) - no joint involvement documented
+     • CRP ≥10 mg/L or ESR ≥28 mm/hr - inflammatory markers not provided
+     • Inadequate response to methotrexate - no methotrexate treatment documented
+     • Currently on stable dose of methotrexate (15-25 mg/week) - patient on cancer chemotherapy, not methotrexate
+     • Corticosteroid requirements - not documented if applicable
+     • NSAID requirements - not documented if applicable
+
+   ⚠ Exclusion Criteria Violated (1):
+     • History of malignancy within 5 years - patient has active Stage IV non-small cell lung cancer diagnosed 6 months ago
+
+   Reasoning:
+     This patient is clearly NOT QUALIFIED for this rheumatoid arthritis clinical trial.
+     The fundamental issue is a complete mismatch between the patient's condition and the trial's target population.
+     The patient has Stage IV non-small cell lung cancer (adenocarcinoma), while the trial is specifically for moderate to severe rheumatoid arthritis.
+     The patient fails to meet virtually all inclusion criteria: (1) No diagnosis of rheumatoid arthritis, (2) No evidence of joint disease, (3) No treatment history with methotrexate, (4) No inflammatory markers suggesting RA activity.
+     Additionally, the patient violates a critical exclusion criterion by having an active malignancy (lung cancer) within 5 years, which is specifically excluded due to safety concerns with immunosuppressive biologic therapy.
+     The patient's current treatment with carboplatin/pemetrexed chemotherapy and Stage IV cancer status make them entirely inappropriate for a rheumatoid arthritis immunomodulatory trial.
+     This appears to be a case where the wrong trial was selected for evaluation against this patient's profile..
+
+--------------------------------------------------------------------------------
+
+4. Adjuvant Therapy for High-Risk Melanoma: Immunotherapy vs. Targeted Therapy
+   Trial ID: NCT05923456
+   Status: NOT_QUALIFIED
+   Confidence: 100.00%
+   Contact: melanoma-adjuvant@mra-trials.org | Phone: 1-855-555-0612
+
+   ✓ Inclusion Criteria Met (5):
+     • Age 18 years or older (patient is 62)
+     • ECOG performance status 0-1 (patient has ECOG 1)
+     • Adequate bone marrow function: ANC ≥1,500/μL (2,100/μL), Platelets ≥100,000/μL (150,000/μL), Hemoglobin ≥9 g/dL (10.5 g/dL)
+     • Adequate renal function: CrCl ≥50 mL/min (75 mL/min)
+     • Adequate hepatic function: Total bilirubin ≤1.5× ULN (0.7 mg/dL), AST/ALT ≤2.5× ULN (25/30 U/L)
+
+   ✗ Inclusion Criteria Not Met (5):
+     • Histologically confirmed cutaneous melanoma (patient has non-small cell lung cancer adenocarcinoma)
+     • Completely resected Stage IIIB or IIIC melanoma disease (patient has Stage IV lung cancer)
+     • Surgery within 12 weeks of enrollment (no melanoma surgery performed)
+     • BRAF V600E or V600K mutation-positive tumor (patient has lung cancer, not melanoma)
+     • Recovered from surgery with complete wound healing (no melanoma surgery performed)
+
+   ⚠ Exclusion Criteria Violated (2):
+     • Stage IV disease (patient has Stage IV non-small cell lung cancer)
+     • Active second malignancy within past 3 years (patient has active Stage IV lung cancer diagnosed 6 months ago)
+
+   Reasoning:
+     This patient is fundamentally ineligible for this melanoma adjuvant therapy trial.
+     The patient has Stage IV non-small cell lung cancer (adenocarcinoma), not melanoma.
+     The trial specifically requires histologically confirmed cutaneous melanoma that has been completely resected at Stage IIIB or IIIC.
+     The patient's lung cancer represents both a different primary tumor type and violates the exclusion criteria for Stage IV disease and active second malignancy within 3 years.
+     Additionally, the patient has not undergone melanoma surgery (wide excision and lymph node dissection) as required, and there is no mention of BRAF mutation testing, which is mandatory for this trial.
+     While the patient meets several laboratory and performance status requirements, the fundamental disease mismatch makes this patient completely ineligible for this melanoma-specific trial..
+
+--------------------------------------------------------------------------------
+
+5. Phase III Study of Novel Immunotherapy for Non-Small Cell Lung Cancer
+   Trial ID: NCT05234567
+   Status: QUALIFIED
+   Confidence: 95.00%
+   Contact: clinicaltrials@nci.gov | Phone: 1-800-555-0199
+
+   ✓ Inclusion Criteria Met (15):
+     • Age 18 years or older (patient is 62 years old)
+     • Histologically confirmed non-small cell lung cancer (adenocarcinoma confirmed by biopsy)
+     • Stage IV disease (confirmed by imaging showing lung mass and liver lesions)
+     • ECOG performance status 0-1 (patient has ECOG 1)
+     • Measurable disease per RECIST 1.1 criteria (measurable disease present on CT scan)
+     • Prior treatment with at least one platinum-based chemotherapy regimen (completed 4 cycles of carboplatin/pemetrexed)
+     • PD-L1 expression level ≥50% (patient has 65% PD-L1 expression)
+     • Adequate organ function - ANC ≥1,500/μL (patient: 2,100/μL)
+     • Adequate organ function - Platelets ≥100,000/μL (patient: 150,000/μL)
+     • Adequate organ function - Hemoglobin ≥9 g/dL (patient: 10.5 g/dL)
+     • Adequate organ function - Creatinine clearance ≥60 mL/min (patient: 75 mL/min)
+     • Adequate organ function - Total bilirubin ≤1.5 × ULN (patient: 0.7 mg/dL, normal)
+     • Adequate organ function - AST and ALT ≤2.5 × ULN (patient: AST 25 U/L, ALT 30 U/L, both normal)
+     • Life expectancy of at least 3 months (patient estimated >6 months)
+     • Willing to provide tissue sample for biomarker analysis (explicitly stated)
+
+   Reasoning:
+     This 62-year-old male patient with Stage IV NSCLC adenocarcinoma meets all inclusion criteria for this Phase III immunotherapy trial.
+     Key qualifying factors include: (1) Confirmed Stage IV NSCLC with measurable disease, (2) ECOG performance status of 1, (3) High PD-L1 expression at 65% (exceeds the ≥50% requirement), (4) Prior platinum-based chemotherapy (carboplatin/pemetrexed), (5) All laboratory values meet adequate organ function requirements, and (6) Life expectancy >6 months exceeds the 3-month minimum.
+     Regarding exclusion criteria, the patient has no active brain metastases (MRI brain 1 month ago was negative), no history of autoimmune disease, no active infections, no concurrent malignancies in the past 5 years, and no HIV/hepatitis infections.
+     The patient appears to have no prior immunotherapy exposure based on the treatment history provided (only chemotherapy mentioned).
+     All exclusion criteria are satisfied.
+     The confidence score of 0.95 reflects high certainty based on comprehensive patient data, with only minor uncertainty regarding potential undisclosed medical history or medications..
+
+--------------------------------------------------------------------------------
+
+6. Prevention Trial of Anticoagulation for Atrial Fibrillation in Elderly Patients
+   Trial ID: NCT05789012
+   Status: NOT_QUALIFIED
+   Confidence: 95.00%
+   Contact: afib-prevention@cardionet.org | Phone: 1-800-555-0578
+
+   ✗ Inclusion Criteria Not Met (5):
+     • Age 65 years or older (patient is 62 years old)
+     • Documented non-valvular atrial fibrillation (no evidence of atrial fibrillation in patient data)
+     • CHA2DS2-VASc score ≥2 (cannot calculate without atrial fibrillation diagnosis)
+     • Sinus rhythm or atrial fibrillation on baseline ECG (no ECG data provided, but no mention of atrial fibrillation)
+     • Not currently on anticoagulation OR inadequately controlled on warfarin (no information about anticoagulation status)
+
+   ⚠ Exclusion Criteria Violated (2):
+     • Active malignancy requiring treatment (Stage IV non-small cell lung cancer with recent chemotherapy treatment)
+     • Life expectancy <2 years (while estimated >6 months, Stage IV lung cancer typically has life expectancy <2 years)
+
+   Reasoning:
+     This patient does NOT qualify for this atrial fibrillation prevention trial for multiple fundamental reasons.
+     First, the patient fails to meet basic inclusion criteria: he is only 62 years old (trial requires ≥65 years) and there is no evidence of atrial fibrillation in his medical history - this is a cardiovascular trial specifically for patients with documented non-valvular atrial fibrillation.
+     The patient's primary condition is Stage IV lung cancer, not atrial fibrillation.
+     Additionally, the patient violates key exclusion criteria: he has active malignancy (Stage IV NSCLC) that recently required treatment (chemotherapy completed 3 months ago), which is explicitly excluded.
+     While his estimated life expectancy is stated as >6 months, Stage IV lung cancer typically carries a prognosis of less than 2 years, which would also be exclusionary.
+     The trial is designed for elderly patients with atrial fibrillation to prevent stroke and bleeding complications from anticoagulation, which is completely unrelated to this patient's oncological condition..
+
+================================================================================
+END OF REPORT
+================================================================================

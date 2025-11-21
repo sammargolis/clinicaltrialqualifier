@@ -178,12 +178,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏥 Medical Information De-identifier</h1>
-        <p class="subtitle">Securely redact PHI from medical records using Skyflow</p>
+        <h1>🏥 Clinical Trial Matcher</h1>
+        <p class="subtitle">De-identify patient data and match to clinical trials</p>
 
         <div class="example">
             <strong>Example:</strong>
-            Try entering: "Patient John Smith, DOB 03/15/1975, SSN 123-45-6789, lives at 123 Main Street, Boston MA. Phone: 555-1234. Medical Record #: MRN-987654"
+            Try: "Patient John Smith, age 62, diagnosed with Stage IV NSCLC. PD-L1 65%, ECOG 1, prior carboplatin/pemetrexed. Recent labs: ANC 2100, Plt 150k, Hgb 10.5, Cr 0.9. No brain mets."
         </div>
 
         <div class="input-section">
@@ -195,23 +195,23 @@
             ></textarea>
         </div>
 
-        <button id="deidentifyBtn" onclick="deidentify()">
-            🔒 De-identify Information
+        <button id="deidentifyBtn" onclick="matchTrials()">
+            🔍 Find Matching Clinical Trials
         </button>
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            Processing...
+            Processing with AI... (may take 1-2 minutes)
         </div>
 
         <div class="result-section" id="resultSection">
-            <div class="result-label">De-identified Result:</div>
+            <div class="result-label">Clinical Trial Matches:</div>
             <div class="result-text" id="resultText"></div>
         </div>
     </div>
 
     <script>
-        async function deidentify() {
+        async function matchTrials() {
             const input = document.getElementById('medicalInput').value.trim();
             const resultSection = document.getElementById('resultSection');
             const resultText = document.getElementById('resultText');
@@ -219,17 +219,16 @@
             const button = document.getElementById('deidentifyBtn');
 
             if (!input) {
-                alert('Please enter some medical information to de-identify');
+                alert('Please enter patient medical information');
                 return;
             }
 
-            // Show loading state
             loading.classList.add('visible');
             button.disabled = true;
             resultSection.classList.remove('visible');
 
             try {
-                const response = await fetch('/deidentify', {
+                const response = await fetch('/deidentify_and_match', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -239,20 +238,55 @@
 
                 const data = await response.json();
 
-                if (response.ok) {
-                    // Display the de-identified text
-                    const deidentifiedText = data.text || JSON.stringify(data, null, 2);
-                    resultText.textContent = deidentifiedText;
+                if (response.ok && data.matches) {
+                    const qualified = data.matches.filter(m => m.match_status === 'QUALIFIED');
+                    const notQualified = data.matches.filter(m => m.match_status === 'NOT_QUALIFIED');
+                    const needsInfo = data.matches.filter(m => m.match_status === 'NEEDS_MORE_INFO');
+                    
+                    let html = `<strong>Total Trials: ${data.matches.length}</strong><br>`;
+                    html += `✅ Qualified: ${qualified.length} | ❌ Not Qualified: ${notQualified.length} | ⚠️ Needs Info: ${needsInfo.length}<br><br>`;
+                    
+                    if (qualified.length > 0) {
+                        html += '<div style="background:#d4edda;padding:15px;border-radius:8px;margin-bottom:15px;"><strong>✅ QUALIFIED TRIALS:</strong><br><br>';
+                        qualified.forEach(m => {
+                            html += `<strong>${m.trial_name}</strong><br>`;
+                            html += `ID: ${m.trial_id} | Confidence: ${(m.confidence_score * 100).toFixed(0)}%<br>`;
+                            html += `Contact: ${m.contact_info}<br>`;
+                            html += `<small>Reasoning: ${m.reasoning.substring(0, 200)}...</small><br><br>`;
+                        });
+                        html += '</div>';
+                    }
+                    
+                    if (needsInfo.length > 0) {
+                        html += '<div style="background:#fff3cd;padding:15px;border-radius:8px;margin-bottom:15px;"><strong>⚠️ NEEDS MORE INFO:</strong><br><br>';
+                        needsInfo.forEach(m => {
+                            html += `<strong>${m.trial_name}</strong> (${(m.confidence_score * 100).toFixed(0)}% confidence)<br>`;
+                        });
+                        html += '</div>';
+                    }
+                    
+                    if (notQualified.length > 0) {
+                        html += '<div style="background:#f8d7da;padding:15px;border-radius:8px;"><strong>❌ NOT QUALIFIED:</strong><br><br>';
+                        notQualified.forEach(m => {
+                            html += `${m.trial_name}<br>`;
+                        });
+                        html += '</div>';
+                    }
+                    
+                    resultText.innerHTML = html;
                     resultText.classList.remove('error');
+                } else if (!data.matches) {
+                    resultText.textContent = `Error: No matches data received. Response: ${JSON.stringify(data).substring(0, 200)}`;
+                    resultText.classList.add('error');
                 } else {
-                    // Display error
-                    resultText.textContent = `Error: ${data.error || 'Unknown error occurred'}`;
+                    resultText.textContent = `Error: ${data.detail || data.error || 'Unknown error'}`;
                     resultText.classList.add('error');
                 }
 
                 resultSection.classList.add('visible');
             } catch (error) {
-                resultText.textContent = `Error: ${error.message}`;
+                console.error('Full error:', error);
+                resultText.textContent = `Error: ${error.message}. Check browser console for details.`;
                 resultText.classList.add('error');
                 resultSection.classList.add('visible');
             } finally {
@@ -261,10 +295,9 @@
             }
         }
 
-        // Allow Enter key to submit (with Ctrl/Cmd)
         document.getElementById('medicalInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                deidentify();
+                matchTrials();
             }
         });
     </script>
