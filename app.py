@@ -71,7 +71,8 @@ async def deidentify(request: DeidentifyRequest):
         if response.status_code == 200:
             skyflow_response = response.json()
             # Extract only the de-identified text from the response
-            deidentified_text = skyflow_response.get('text', '')
+            # Skyflow returns 'processed_text' as the key
+            deidentified_text = skyflow_response.get('processed_text', '')
             return DeidentifyResponse(text=deidentified_text)
         else:
             raise HTTPException(
