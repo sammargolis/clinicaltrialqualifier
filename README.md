@@ -50,6 +50,58 @@ Returns a curated set of qualified clinical trials that match the patient's prof
 - **Claude AI**: Intelligent agent orchestration
 - **Clinical Trials MCP**: Clinical trial database access
 - **Subagent Architecture**: Specialized qualification logic
+- **Flask**: Python web framework for the frontend
+- **HTML/CSS/JavaScript**: User interface
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.8 or higher
+- pip (Python package manager)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd clinicaltrialqualifier
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### Running the Application
+
+1. Start the Flask server:
+```bash
+python app.py
+```
+
+2. Open your browser and navigate to:
+```
+http://localhost:5000
+```
+
+3. Enter medical information in the text box and click "De-identify Information" to see PHI automatically redacted.
+
+### Example Usage
+
+Try entering sample medical information like:
+```
+Patient John Smith, DOB 03/15/1975, SSN 123-45-6789, lives at 123 Main Street, Boston MA. 
+Phone: 555-1234. Medical Record #: MRN-987654
+```
+
+The system will automatically detect and redact:
+- Names
+- Dates of birth
+- Social Security Numbers
+- Addresses
+- Phone numbers
+- Medical record numbers
 
 ## Use Cases
 

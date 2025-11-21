@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Information De-identifier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result-section.visible {
+            display: block;
+        }
+
+        .result-label {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .result-text {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            color: #333;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 14px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .loading.visible {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .example {
+            background: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #1976d2;
+        }
+
+        .example strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Medical Information De-identifier</h1>
+        <p class="subtitle">Securely redact PHI from medical records using Skyflow</p>
+
+        <div class="example">
+            <strong>Example:</strong>
+            Try entering: "Patient John Smith, DOB 03/15/1975, SSN 123-45-6789, lives at 123 Main Street, Boston MA. Phone: 555-1234. Medical Record #: MRN-987654"
+        </div>
+
+        <div class="input-section">
+            <label for="medicalInput">Enter Medical Information:</label>
+            <textarea 
+                id="medicalInput" 
+                rows="8" 
+                placeholder="Enter patient medical information here. All PHI will be automatically detected and redacted..."
+            ></textarea>
+        </div>
+
+        <button id="deidentifyBtn" onclick="deidentify()">
+            🔒 De-identify Information
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            Processing...
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-label">De-identified Result:</div>
+            <div class="result-text" id="resultText"></div>
+        </div>
+    </div>
+
+    <script>
+        async function deidentify() {
+            const input = document.getElementById('medicalInput').value.trim();
+            const resultSection = document.getElementById('resultSection');
+            const resultText = document.getElementById('resultText');
+            const loading = document.getElementById('loading');
+            const button = document.getElementById('deidentifyBtn');
+
+            if (!input) {
+                alert('Please enter some medical information to de-identify');
+                return;
+            }
+
+            // Show loading state
+            loading.classList.add('visible');
+            button.disabled = true;
+            resultSection.classList.remove('visible');
+
+            try {
+                const response = await fetch('/deidentify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: input })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Display the de-identified text
+                    const deidentifiedText = data.text || JSON.stringify(data, null, 2);
+                    resultText.textContent = deidentifiedText;
+                    resultText.classList.remove('error');
+                } else {
+                    // Display error
+                    resultText.textContent = `Error: ${data.error || 'Unknown error occurred'}`;
+                    resultText.classList.add('error');
+                }
+
+                resultSection.classList.add('visible');
+            } catch (error) {
+                resultText.textContent = `Error: ${error.message}`;
+                resultText.classList.add('error');
+                resultSection.classList.add('visible');
+            } finally {
+                loading.classList.remove('visible');
+                button.disabled = false;
+            }
+        }
+
+        // Allow Enter key to submit (with Ctrl/Cmd)
+        document.getElementById('medicalInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                deidentify();
+            }
+        });
+    </script>
+</body>
+</html>
+
