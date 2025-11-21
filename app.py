@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from typing import Optional
 import requests
 from pathlib import Path
 
@@ -24,7 +25,7 @@ class DeidentifyResponse(BaseModel):
 
 class ErrorResponse(BaseModel):
     error: str
-    details: str = None
+    details: Optional[str] = None
 
 
 @app.get("/", response_class=HTMLResponse)
