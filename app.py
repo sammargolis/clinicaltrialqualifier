@@ -50,7 +50,10 @@ def deidentify():
         )
         
         if response.status_code == 200:
-            return jsonify(response.json())
+            skyflow_response = response.json()
+            # Extract only the de-identified text from the response
+            deidentified_text = skyflow_response.get('text', '')
+            return jsonify({'text': deidentified_text})
         else:
             return jsonify({
                 'error': f'Skyflow API error: {response.status_code}',
