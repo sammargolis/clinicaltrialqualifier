@@ -9,7 +9,14 @@ import os
 import json
 import asyncio
 from dotenv import load_dotenv
-from .clinical_trial_matcher import ClinicalTrialMatcher, TrialMatch
+import sys
+from pathlib import Path
+
+# Add src directory to path for imports
+if str(Path(__file__).parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).parent))
+
+from clinical_trial_matcher import ClinicalTrialMatcher, TrialMatch
 
 # Load environment variables
 load_dotenv()
