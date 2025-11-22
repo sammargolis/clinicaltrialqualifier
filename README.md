@@ -48,8 +48,11 @@ Returns a curated set of qualified clinical trials that match the patient's prof
 
 - **Skyflow Detect**: PHI detection and redaction
 - **Claude AI (Sonnet 4)**: Intelligent agent orchestration and medical reasoning
-- **Clinical Trials MCP Server**: Real-time access to ClinicalTrials.gov API
+- **Clinical Trials MCP Server**: Real-time access to ClinicalTrials.gov API v2 via Model Context Protocol
+  - Repository: [ClinicalTrialsGov-MCP](https://github.com/caldavidlee/ClinicalTrialsGov-MCP)
+  - Server: `https://clinicaltrialsgov-mcp.onrender.com`
 - **Model Context Protocol (MCP)**: Standard for connecting AI agents to external data sources
+- **ClinicalTrials.gov API v2**: Official API for accessing clinical trial data
 - **FastAPI**: Modern, high-performance Python web framework
 - **Uvicorn**: ASGI server for FastAPI
 - **HTML/CSS/JavaScript**: User interface
@@ -241,9 +244,46 @@ The system now queries **ClinicalTrials.gov** in real-time through an MCP server
 - **Comprehensive Coverage**: Trials across all medical conditions and phases
 - **Intelligent Search**: Claude extracts conditions from patient data to find relevant trials
 
+#### MCP Server Implementation
+
+This project uses the **ClinicalTrialsGov-MCP** server, which provides a Model Context Protocol (MCP) interface to the ClinicalTrials.gov API v2. The MCP server is an open-source project that enables standardized access to clinical trial data.
+
+**MCP Server Repository**: [https://github.com/caldavidlee/ClinicalTrialsGov-MCP](https://github.com/caldavidlee/ClinicalTrialsGov-MCP)
+
+**About the MCP Server:**
+- **Purpose**: ClinicalTrials.gov v2 MCP server with limited endpoints
+- **Technology**: TypeScript-based MCP implementation
+- **Deployment**: Available at `https://clinicaltrialsgov-mcp.onrender.com` (hosted on Render)
+- **Protocol**: Implements Model Context Protocol (MCP) standard for AI agent integration
+
 **MCP Server Tools:**
 - `list_studies`: Searches ClinicalTrials.gov by medical condition
+  - Parameters: `cond`, `term`, `locn`, `overallStatus`, `pageSize`, `format`, `countTotal`, `pageToken`
+  - Returns: List of matching clinical trials with NCT IDs
 - `get_study`: Retrieves detailed information for a specific trial by NCT ID
+  - Parameters: `nct_id`
+  - Returns: Complete trial details including eligibility criteria, description, and contact information
+
+**Request Format:**
+The MCP server uses JSON-RPC 2.0 format over HTTP with Server-Sent Events (SSE):
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "list_studies",
+    "arguments": {
+      "cond": "breast cancer",
+      "pageSize": 20,
+      "format": "json"
+    }
+  },
+  "id": 1
+}
+```
+
+**Response Format:**
+The server returns SSE format with data in `result.content[0].text` as a JSON string that contains the actual ClinicalTrials.gov API response.
 
 Each trial retrieved includes:
 - Detailed inclusion/exclusion criteria
@@ -344,16 +384,36 @@ matcher = ClinicalTrialMatcher(
 
 To run your own MCP server locally for testing:
 
-1. Clone the ClinicalTrials.gov MCP repository
-2. Install dependencies: `npm install`
-3. Run the server: `npm run dev`
-4. Update the URL to point to your local server:
+1. **Clone the ClinicalTrials.gov MCP repository**:
+   ```bash
+   git clone https://github.com/caldavidlee/ClinicalTrialsGov-MCP.git
+   cd ClinicalTrialsGov-MCP
+   ```
 
-```python
-matcher = ClinicalTrialMatcher(
-    mcp_server_url="http://localhost:3000"
-)
-```
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Build the project**:
+   ```bash
+   npm run build
+   ```
+
+4. **Run the server**:
+   ```bash
+   npm run dev
+   ```
+
+5. **Update the URL** to point to your local server:
+
+   ```python
+   matcher = ClinicalTrialMatcher(
+       mcp_server_url="http://localhost:3000"
+   )
+   ```
+
+**MCP Server Source Code**: For more details about the MCP server implementation, see the [ClinicalTrialsGov-MCP GitHub repository](https://github.com/caldavidlee/ClinicalTrialsGov-MCP).
 
 ### Adjusting Agent Behavior
 
