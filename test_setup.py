@@ -51,10 +51,10 @@ def check_files():
     required_files = [
         "app.py",
         "clinical_trial_matcher.py",
-        "clinical_trials.txt",
         "demo_matcher.py",
         "requirements.txt",
         "env.example",
+        "MCP_MIGRATION_GUIDE.md",
     ]
     
     all_ok = True
@@ -197,9 +197,10 @@ def main():
     if passed == total:
         print("\n✓ All checks passed! You're ready to use the Clinical Trial Matcher.")
         print("\nNext steps:")
-        print("  1. Run the demo: python demo_matcher.py")
-        print("  2. Start the API server: ./run.sh or python app.py")
-        print("  3. Visit http://localhost:5000/docs for API documentation")
+        print("  1. Test MCP integration: python test_mcp_integration.py")
+        print("  2. Run the demo: python demo_matcher.py")
+        print("  3. Start the API server: ./run.sh or python app.py")
+        print("  4. Visit http://localhost:5000/docs for API documentation")
     else:
         print("\n⚠ Some checks failed. Please address the issues above.")
         if not results[3][1]:  # env config failed

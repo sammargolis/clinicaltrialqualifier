@@ -42,10 +42,13 @@ Life expectancy estimated > 6 months.
 Willing to provide tissue samples for biomarker testing.
 """
 
-print("Testing Clinical Trial Matcher...")
+print("Testing Clinical Trial Matcher with MCP integration...")
 print("=" * 70)
 
-matcher = ClinicalTrialMatcher(trials_file_path="clinical_trials.txt")
+# Initialize with MCP server
+matcher = ClinicalTrialMatcher(
+    mcp_server_url="https://clinicaltrialsgov-mcp.onrender.com"
+)
 matches = matcher.match_patient_to_trials(patient)
 
 # Show summary

@@ -146,6 +146,46 @@
             display: block;
         }
 
+        .progress-log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            display: none;
+            border: 1px solid #e0e0e0;
+        }
+
+        .progress-log.visible {
+            display: block;
+        }
+
+        .progress-line {
+            padding: 3px 0;
+            border-left: 3px solid transparent;
+            padding-left: 10px;
+            margin: 2px 0;
+        }
+
+        .progress-line.status {
+            border-left-color: #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .progress-line.thinking {
+            border-left-color: #ccc;
+            color: #666;
+        }
+
+        .progress-line.error {
+            border-left-color: #dc3545;
+            color: #dc3545;
+        }
+
         .spinner {
             border: 3px solid #f3f3f3;
             border-top: 3px solid #667eea;
@@ -201,8 +241,10 @@
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            Processing with AI... (may take 1-2 minutes)
+            Processing with AI... (may take 2-4 minutes)
         </div>
+
+        <div class="progress-log" id="progressLog"></div>
 
         <div class="result-section" id="resultSection">
             <div class="result-label">Clinical Trial Matches:</div>
@@ -216,6 +258,7 @@
             const resultSection = document.getElementById('resultSection');
             const resultText = document.getElementById('resultText');
             const loading = document.getElementById('loading');
+            const progressLog = document.getElementById('progressLog');
             const button = document.getElementById('deidentifyBtn');
 
             if (!input) {
@@ -224,11 +267,22 @@
             }
 
             loading.classList.add('visible');
+            progressLog.classList.add('visible');
+            progressLog.innerHTML = '';
             button.disabled = true;
             resultSection.classList.remove('visible');
 
+            function addProgressLine(text, type = 'thinking') {
+                const line = document.createElement('div');
+                line.className = `progress-line ${type}`;
+                line.textContent = text;
+                progressLog.appendChild(line);
+                progressLog.scrollTop = progressLog.scrollHeight;
+            }
+
             try {
-                const response = await fetch('/deidentify_and_match', {
+                // Use streaming endpoint for real-time progress
+                const response = await fetch('/deidentify_and_match_stream', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -236,56 +290,88 @@
                     body: JSON.stringify({ text: input })
                 });
 
-                const data = await response.json();
-
-                if (response.ok && data.matches) {
-                    const qualified = data.matches.filter(m => m.match_status === 'QUALIFIED');
-                    const notQualified = data.matches.filter(m => m.match_status === 'NOT_QUALIFIED');
-                    const needsInfo = data.matches.filter(m => m.match_status === 'NEEDS_MORE_INFO');
-                    
-                    let html = `<strong>Total Trials: ${data.matches.length}</strong><br>`;
-                    html += `✅ Qualified: ${qualified.length} | ❌ Not Qualified: ${notQualified.length} | ⚠️ Needs Info: ${needsInfo.length}<br><br>`;
-                    
-                    if (qualified.length > 0) {
-                        html += '<div style="background:#d4edda;padding:15px;border-radius:8px;margin-bottom:15px;"><strong>✅ QUALIFIED TRIALS:</strong><br><br>';
-                        qualified.forEach(m => {
-                            html += `<strong>${m.trial_name}</strong><br>`;
-                            html += `ID: ${m.trial_id} | Confidence: ${(m.confidence_score * 100).toFixed(0)}%<br>`;
-                            html += `Contact: ${m.contact_info}<br>`;
-                            html += `<small>Reasoning: ${m.reasoning.substring(0, 200)}...</small><br><br>`;
-                        });
-                        html += '</div>';
-                    }
-                    
-                    if (needsInfo.length > 0) {
-                        html += '<div style="background:#fff3cd;padding:15px;border-radius:8px;margin-bottom:15px;"><strong>⚠️ NEEDS MORE INFO:</strong><br><br>';
-                        needsInfo.forEach(m => {
-                            html += `<strong>${m.trial_name}</strong> (${(m.confidence_score * 100).toFixed(0)}% confidence)<br>`;
-                        });
-                        html += '</div>';
-                    }
-                    
-                    if (notQualified.length > 0) {
-                        html += '<div style="background:#f8d7da;padding:15px;border-radius:8px;"><strong>❌ NOT QUALIFIED:</strong><br><br>';
-                        notQualified.forEach(m => {
-                            html += `${m.trial_name}<br>`;
-                        });
-                        html += '</div>';
-                    }
-                    
-                    resultText.innerHTML = html;
-                    resultText.classList.remove('error');
-                } else if (!data.matches) {
-                    resultText.textContent = `Error: No matches data received. Response: ${JSON.stringify(data).substring(0, 200)}`;
-                    resultText.classList.add('error');
-                } else {
-                    resultText.textContent = `Error: ${data.detail || data.error || 'Unknown error'}`;
-                    resultText.classList.add('error');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                resultSection.classList.add('visible');
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                
+                                if (data.type === 'status') {
+                                    addProgressLine(data.text, 'status');
+                                } else if (data.type === 'thinking') {
+                                    addProgressLine(data.text, 'thinking');
+                                } else if (data.type === 'complete') {
+                                    // Final results
+                                    const matches = data.matches || [];
+                                    const qualified = matches.filter(m => m.match_status === 'QUALIFIED');
+                                    const notQualified = matches.filter(m => m.match_status === 'NOT_QUALIFIED');
+                                    const needsInfo = matches.filter(m => m.match_status === 'NEEDS_MORE_INFO');
+                                    
+                                    let html = `<strong>Total Trials: ${matches.length}</strong><br>`;
+                                    html += `✅ Qualified: ${qualified.length} | ❌ Not Qualified: ${notQualified.length} | ⚠️ Needs Info: ${needsInfo.length}<br><br>`;
+                                    
+                                    if (qualified.length > 0) {
+                                        html += '<div style="background:#d4edda;padding:15px;border-radius:8px;margin-bottom:15px;"><strong>✅ QUALIFIED TRIALS:</strong><br><br>';
+                                        qualified.forEach(m => {
+                                            html += `<strong>${m.trial_name}</strong><br>`;
+                                            html += `ID: ${m.trial_id} | Confidence: ${(m.confidence_score * 100).toFixed(0)}%<br>`;
+                                            html += `Contact: ${m.contact_info || 'Not available'}<br>`;
+                                            html += `<small>Reasoning: ${m.reasoning ? m.reasoning.substring(0, 200) + '...' : 'N/A'}</small><br><br>`;
+                                        });
+                                        html += '</div>';
+                                    }
+                                    
+                                    if (needsInfo.length > 0) {
+                                        html += '<div style="background:#fff3cd;padding:15px;border-radius:8px;margin-bottom:15px;"><strong>⚠️ NEEDS MORE INFO:</strong><br><br>';
+                                        needsInfo.forEach(m => {
+                                            html += `<strong>${m.trial_name}</strong> (${(m.confidence_score * 100).toFixed(0)}% confidence)<br>`;
+                                        });
+                                        html += '</div>';
+                                    }
+                                    
+                                    if (notQualified.length > 0 && notQualified.length <= 10) {
+                                        html += '<div style="background:#f8d7da;padding:15px;border-radius:8px;"><strong>❌ NOT QUALIFIED:</strong><br><br>';
+                                        notQualified.forEach(m => {
+                                            html += `${m.trial_name}<br>`;
+                                        });
+                                        html += '</div>';
+                                    }
+                                    
+                                    resultText.innerHTML = html;
+                                    resultText.classList.remove('error');
+                                    resultSection.classList.add('visible');
+                                    addProgressLine('✓ Complete! Results displayed below.', 'status');
+                                } else if (data.type === 'error') {
+                                    addProgressLine(`✗ Error: ${data.text}`, 'error');
+                                    resultText.textContent = `Error: ${data.text}`;
+                                    resultText.classList.add('error');
+                                    resultSection.classList.add('visible');
+                                }
+                            } catch (e) {
+                                console.error('Error parsing SSE data:', e, line);
+                            }
+                        }
+                    }
+                }
+
             } catch (error) {
                 console.error('Full error:', error);
+                addProgressLine(`✗ Error: ${error.message}`, 'error');
                 resultText.textContent = `Error: ${error.message}. Check browser console for details.`;
                 resultText.classList.add('error');
                 resultSection.classList.add('visible');

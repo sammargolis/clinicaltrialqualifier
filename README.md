@@ -47,9 +47,9 @@ Returns a curated set of qualified clinical trials that match the patient's prof
 ## Technologies
 
 - **Skyflow Detect**: PHI detection and redaction
-- **Claude AI**: Intelligent agent orchestration
-- **Clinical Trials MCP**: Clinical trial database access
-- **Subagent Architecture**: Specialized qualification logic
+- **Claude AI (Sonnet 4)**: Intelligent agent orchestration and medical reasoning
+- **Clinical Trials MCP Server**: Real-time access to ClinicalTrials.gov API
+- **Model Context Protocol (MCP)**: Standard for connecting AI agents to external data sources
 - **FastAPI**: Modern, high-performance Python web framework
 - **Uvicorn**: ASGI server for FastAPI
 - **HTML/CSS/JavaScript**: User interface
@@ -156,9 +156,17 @@ The system uses Claude Sonnet 4 as an intelligent agent to evaluate patient elig
 ```
 Patient Data → PHI Redaction (Skyflow) → Deidentified Data → Claude Agent → Trial Matches
                                                                     ↓
-                                                          Clinical Trials Database
-                                                          (clinical_trials.txt)
+                                                          MCP Server
+                                                                    ↓
+                                                          ClinicalTrials.gov API
+                                                          (Real-time data)
 ```
+
+The system now uses an MCP (Model Context Protocol) server to access ClinicalTrials.gov in real-time:
+- Extracts medical conditions from patient data using Claude
+- Queries ClinicalTrials.gov through MCP `list_studies` tool
+- Retrieves detailed trial information using MCP `get_study` tool
+- Evaluates each trial's eligibility criteria against patient data
 
 ### Using the Clinical Trial Matcher
 
@@ -167,8 +175,10 @@ Patient Data → PHI Redaction (Skyflow) → Deidentified Data → Claude Agent 
 ```python
 from clinical_trial_matcher import ClinicalTrialMatcher
 
-# Initialize the matcher
-matcher = ClinicalTrialMatcher(trials_file_path="clinical_trials.txt")
+# Initialize the matcher with MCP server
+matcher = ClinicalTrialMatcher(
+    mcp_server_url="https://clinicaltrialsgov-mcp.onrender.com"
+)
 
 # Your deidentified patient data
 patient_data = """
@@ -176,7 +186,7 @@ Patient is a 62 year old with Stage IV NSCLC...
 [deidentified medical information]
 """
 
-# Match patient to trials
+# Match patient to trials (queries ClinicalTrials.gov in real-time)
 matches = matcher.match_patient_to_trials(patient_data)
 
 # Generate report
@@ -220,37 +230,40 @@ The demo script includes three example patients:
 - Type 2 Diabetes with Cardiovascular Disease patient
 - Alzheimer's Disease patient
 
-Each will be evaluated against all 6 clinical trials in the database.
+Each will be evaluated against relevant clinical trials from ClinicalTrials.gov based on their medical conditions.
 
-### Clinical Trials Database
+### Clinical Trials Data Source
 
-The system includes a sample database (`clinical_trials.txt`) with 6 realistic clinical trials:
+The system now queries **ClinicalTrials.gov** in real-time through an MCP server, providing:
 
-1. **NCT05234567**: Phase III Immunotherapy for Non-Small Cell Lung Cancer
-2. **NCT05876543**: GLP-1 Agonist for Type 2 Diabetes with CVD
-3. **NCT05432198**: Early Intervention for Alzheimer's Disease
-4. **NCT05654321**: Biologic Therapy for Rheumatoid Arthritis
-5. **NCT05789012**: Anticoagulation for Atrial Fibrillation
-6. **NCT05923456**: Adjuvant Therapy for High-Risk Melanoma
+- **Live Data**: Access to over 400,000+ registered clinical trials
+- **Up-to-Date Information**: Always current trial status, locations, and criteria
+- **Comprehensive Coverage**: Trials across all medical conditions and phases
+- **Intelligent Search**: Claude extracts conditions from patient data to find relevant trials
 
-Each trial includes:
-- Detailed inclusion criteria
-- Detailed exclusion criteria
-- Contact information
-- Trial metadata (phase, status, sponsor, etc.)
+**MCP Server Tools:**
+- `list_studies`: Searches ClinicalTrials.gov by medical condition
+- `get_study`: Retrieves detailed information for a specific trial by NCT ID
+
+Each trial retrieved includes:
+- Detailed inclusion/exclusion criteria
+- Trial metadata (phase, status, sponsor, locations)
+- Contact information for enrollment
+- Study design and outcome measures
 
 ### How the Agent Works
 
-The Claude agent uses a sophisticated evaluation process:
+The Claude agent uses a sophisticated multi-step evaluation process:
 
-1. **System Prompt**: Establishes the agent as an expert clinical trial coordinator
-2. **Trial-by-Trial Evaluation**: Each trial is evaluated independently
-3. **Structured Output**: Returns JSON with:
+1. **Condition Extraction**: Analyzes patient data to identify primary medical conditions
+2. **Trial Search**: Queries ClinicalTrials.gov via MCP `list_studies` tool
+3. **Trial Retrieval**: Gets detailed information for each trial via MCP `get_study` tool
+4. **Eligibility Evaluation**: Each trial is evaluated independently with:
    - Match status (QUALIFIED / NOT_QUALIFIED / NEEDS_MORE_INFO)
    - Confidence score (0.0 - 1.0)
    - Specific criteria met or not met
    - Detailed reasoning
-4. **Conservative Approach**: Prioritizes patient safety; requires all criteria to be clearly met
+5. **Ranking**: Results sorted by confidence score to prioritize best matches
 
 ### Example Output
 
@@ -317,41 +330,40 @@ Needs More Information: 1
 
 ## Customization
 
-### Adding Your Own Clinical Trials
+### Configuring the MCP Server
 
-Edit `clinical_trials.txt` following this format:
+The default MCP server URL is `https://clinicaltrialsgov-mcp.onrender.com`. To use a different MCP server:
 
+```python
+matcher = ClinicalTrialMatcher(
+    mcp_server_url="https://your-mcp-server.com"
+)
 ```
-TRIAL ID: NCT12345678
-Trial Name: Your Trial Name
-Sponsor: Your Organization
-Status: RECRUITING
-Phase: Phase X
-Condition: Medical Condition
-Primary Outcome: Outcome measure
 
-INCLUSION CRITERIA:
-- Criterion 1
-- Criterion 2
-...
+### Using a Local MCP Server
 
-EXCLUSION CRITERIA:
-- Criterion 1
-- Criterion 2
-...
+To run your own MCP server locally for testing:
 
-CONTACT: email@example.com | Phone: 1-800-XXX-XXXX
+1. Clone the ClinicalTrials.gov MCP repository
+2. Install dependencies: `npm install`
+3. Run the server: `npm run dev`
+4. Update the URL to point to your local server:
 
-================================================================================
+```python
+matcher = ClinicalTrialMatcher(
+    mcp_server_url="http://localhost:3000"
+)
 ```
 
 ### Adjusting Agent Behavior
 
 Modify `clinical_trial_matcher.py`:
 
-- **Temperature**: Currently set to 0.1 for consistent evaluation. Increase for more varied responses.
-- **Max Tokens**: Set to 4000. Increase if trials have very long criteria.
-- **Model**: Currently uses `claude-sonnet-4-20250514`. Can switch to other Claude models.
+- **Temperature**: Set to 0.3 for consistent yet flexible evaluation
+- **Max Tokens**: Set to 2000 per trial evaluation. Increase for very detailed analysis
+- **Model**: Uses `claude-sonnet-4-20250514` for best medical reasoning
+- **Max Studies**: Default searches for up to 20 studies, returns top 10 matches
+- **Search Strategy**: Modify `_extract_conditions_from_patient_data()` to adjust condition extraction
 
 ## Troubleshooting
 
@@ -361,16 +373,23 @@ Modify `clinical_trial_matcher.py`:
 - Verify the `.env` file is in the project root directory
 
 ### Agent takes too long
-- The agent evaluates each trial sequentially
-- For 6 trials, expect 1-2 minutes total processing time
-- Each Claude API call takes ~10-20 seconds
+- The agent queries ClinicalTrials.gov and evaluates each trial sequentially
+- Expect ~2-3 minutes for full workflow (search + 10 trial evaluations)
+- Each MCP query takes ~2-5 seconds
+- Each trial evaluation takes ~10-20 seconds
 
 ### Low confidence scores
 - May indicate missing information in patient data
 - Add more detailed medical history, lab values, and imaging results
 - Ensure all relevant criteria are addressed in the patient data
 
+### MCP connection errors
+- Verify the MCP server URL is correct
+- Check that https://clinicaltrialsgov-mcp.onrender.com is accessible
+- Ensure network connectivity and no firewall blocking
+- MCP server may be cold-starting (Render free tier) - retry after 30 seconds
+
 ---
 
-*This project demonstrates the intersection of privacy-preserving technologies, AI agents, and healthcare data to solve real-world clinical challenges.*
+*This project demonstrates the intersection of privacy-preserving technologies, AI agents, Model Context Protocol (MCP), and healthcare data to solve real-world clinical challenges.*
 

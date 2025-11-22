@@ -109,7 +109,8 @@ async def deidentify(request: DeidentifyRequest):
 async def match_trials(request: TrialMatchRequest):
     """
     Match deidentified patient data against clinical trials using Claude AI.
-    This endpoint uses advanced AI to intelligently evaluate eligibility criteria.
+    This endpoint uses advanced AI to intelligently evaluate eligibility criteria
+    and queries ClinicalTrials.gov API through an MCP server.
     """
     try:
         # Check if API key is configured
@@ -119,9 +120,10 @@ async def match_trials(request: TrialMatchRequest):
                 detail="ANTHROPIC_API_KEY not configured. Please set it in your .env file."
             )
         
-        # Initialize the matcher
-        trials_file = Path(__file__).parent / "clinical_trials.txt"
-        matcher = ClinicalTrialMatcher(trials_file_path=str(trials_file))
+        # Initialize the matcher with MCP server
+        matcher = ClinicalTrialMatcher(
+            mcp_server_url="https://clinicaltrialsgov-mcp.onrender.com"
+        )
         
         # Match patient to trials
         matches = matcher.match_patient_to_trials(
@@ -144,6 +146,7 @@ async def match_trials(request: TrialMatchRequest):
 async def deidentify_and_match_stream(request: DeidentifyRequest):
     """
     Streaming version: Shows Claude's thinking as it evaluates each trial
+    Uses MCP server to query ClinicalTrials.gov API
     """
     async def generate():
         try:
@@ -152,23 +155,48 @@ async def deidentify_and_match_stream(request: DeidentifyRequest):
             deidentify_result = await deidentify(request)
             deidentified_text = deidentify_result.text
             
-            msg = 'PHI redacted. Starting Claude AI evaluation...\n'
+            msg = 'PHI redacted. Analyzing patient data...\n'
             yield f"data: {json.dumps({'type': 'status', 'text': msg})}\n\n"
             
-            # Step 2: Stream Claude's thinking
-            trials_file = Path(__file__).parent / "clinical_trials.txt"
-            matcher = ClinicalTrialMatcher(trials_file_path=str(trials_file))
+            # Step 2: Initialize matcher with MCP
+            matcher = ClinicalTrialMatcher(
+                mcp_server_url="https://clinicaltrialsgov-mcp.onrender.com"
+            )
             
-            # Get trials
-            trials = matcher._parse_trials(matcher.trials_database)
+            # Extract conditions
+            yield f"data: {json.dumps({'type': 'status', 'text': 'Identifying medical conditions...'})}\n\n"
+            conditions = matcher._extract_conditions_from_patient_data(deidentified_text)
+            
+            cond_msg = f"Searching for: {', '.join(conditions)}\n"
+            yield f"data: {json.dumps({'type': 'thinking', 'text': cond_msg})}\n\n"
+            await asyncio.sleep(0.1)
+            
+            # Search for trials
+            yield f"data: {json.dumps({'type': 'status', 'text': 'Querying ClinicalTrials.gov...'})}\n\n"
+            trial_ids = matcher._search_trials_via_mcp(conditions, max_studies=20)
+            
+            search_msg = f"Found {len(trial_ids)} potential trials\n"
+            yield f"data: {json.dumps({'type': 'thinking', 'text': search_msg})}\n\n"
+            await asyncio.sleep(0.1)
+            
             system_prompt = """You are an expert clinical trial coordinator helping find reasonable matches. Be flexible with data format and focus on main criteria, not minor details."""
             
             all_matches = []
             
-            for i, trial in enumerate(trials, 1):
-                trial_name = trial.get("trial_name", "Unknown")
-                header = f'\n\n=== Trial {i}/{len(trials)}: {trial_name} ===\n'
+            # Evaluate each trial
+            for i, trial_id in enumerate(trial_ids, 1):
+                header = f'\n\n=== Trial {i}/{len(trial_ids)}: {trial_id} ===\n'
                 yield f"data: {json.dumps({'type': 'thinking', 'text': header})}\n\n"
+                await asyncio.sleep(0.1)
+                
+                # Get trial details
+                trial = matcher._get_trial_details_via_mcp(trial_id)
+                if not trial:
+                    continue
+                
+                trial_name = trial.get("trial_name", "Unknown")
+                name_msg = f'Study: {trial_name}\n'
+                yield f"data: {json.dumps({'type': 'thinking', 'text': name_msg})}\n\n"
                 await asyncio.sleep(0.1)
                 
                 # Evaluate trial

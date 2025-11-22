@@ -141,13 +141,15 @@ def run_demo(patient_data: str, patient_description: str):
             print("  export ANTHROPIC_API_KEY='your-api-key-here'")
             return
         
-        # Initialize the matcher
-        print("Initializing Clinical Trial Matcher...")
-        matcher = ClinicalTrialMatcher(trials_file_path="clinical_trials.txt")
+        # Initialize the matcher with MCP server
+        print("Initializing Clinical Trial Matcher with MCP server...")
+        matcher = ClinicalTrialMatcher(
+            mcp_server_url="https://clinicaltrialsgov-mcp.onrender.com"
+        )
         
         # Match patient to trials
-        print(f"Evaluating {patient_description} against clinical trials database...")
-        print("This may take 1-2 minutes as Claude analyzes each trial...\n")
+        print(f"Evaluating {patient_description} against ClinicalTrials.gov...")
+        print("This may take 1-2 minutes as we query the API and analyze each trial...\n")
         
         matches = matcher.match_patient_to_trials(patient_data, max_trials_to_return=10)
         
@@ -172,7 +174,7 @@ def main():
     """Run demos for all example patients"""
     print("\n" + "=" * 80)
     print("CLINICAL TRIAL MATCHER - DEMONSTRATION")
-    print("Using Claude AI to match deidentified patient data to clinical trials")
+    print("Using Claude AI and MCP to match patient data to ClinicalTrials.gov")
     print("=" * 80)
     print()
     
