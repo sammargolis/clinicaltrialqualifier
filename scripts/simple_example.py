@@ -8,7 +8,13 @@ ClinicalTrials.gov in real-time.
 """
 
 import os
+import sys
+from pathlib import Path
 from dotenv import load_dotenv
+
+# Add src directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
 from clinical_trial_matcher import ClinicalTrialMatcher
 
 # Load your API key from .env file

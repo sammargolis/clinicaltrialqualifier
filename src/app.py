@@ -9,7 +9,7 @@ import os
 import json
 import asyncio
 from dotenv import load_dotenv
-from clinical_trial_matcher import ClinicalTrialMatcher, TrialMatch
+from .clinical_trial_matcher import ClinicalTrialMatcher, TrialMatch
 
 # Load environment variables
 load_dotenv()
@@ -49,7 +49,7 @@ class TrialMatchResponse(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 async def index():
     """Serve the main page"""
-    template_path = Path(__file__).parent / "templates" / "index.html"
+    template_path = Path(__file__).parent.parent / "templates" / "index.html"
     with open(template_path, "r") as f:
         return HTMLResponse(content=f.read())
 
@@ -255,5 +255,12 @@ async def deidentify_and_match(request: DeidentifyRequest):
 
 if __name__ == '__main__':
     import uvicorn
+    import sys
+    from pathlib import Path
+    
+    # Ensure we're in the project root for templates and other resources
+    project_root = Path(__file__).parent.parent
+    os.chdir(project_root)
+    
     uvicorn.run(app, host="0.0.0.0", port=5000, log_level="info")
 
